@@ -1,0 +1,2 @@
+mfhi $s1
+srav $s1, $s2, 12
