@@ -1,34 +1,33 @@
 public class Instruction {
      private String instru;
-     private String regisDest;
-     private String regisRead1;
-     private String regisRead2;
+     private String regis1;
+     private String regis2;
+     private String regis3;
 
-     public Instruction(String instru,String regisDest, String regisRead2, String regisRead1) {
+     public Instruction(String instru, String regis1, String regis3, String regis2) {
           this.instru = instru;
-          this.regisDest = regisDest;
-          this.regisRead1 = regisRead1;
-          this.regisRead2 = regisRead2;
+          this.regis1 = regis1;
+          this.regis2 = regis2;
+          this.regis3 = regis3;
      }
 
      public String getInstru() {
           return instru;
      }
 
-     public String getRegisDest() {
-          return regisDest;
+     public String getRegis1() {
+          return regis1;
      }
 
-     public String getRegisRead1() {
-          return regisRead1;
+     public String getRegis2() {
+          return regis2;
      }
 
-     public String getRegisRead2() {
-          return regisRead2;
+     public String getRegis3() {
+          return regis3;
      }
 
-     public String getAllValues(){
-          return instru + " " + regisDest + " " + regisRead1 + " " + regisRead2;
+     public String getAllValues() {
+          return instru + " " + regis1 + " " + regis2 + " " + regis3;
      }
-
 }

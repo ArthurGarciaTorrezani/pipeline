@@ -1,12 +1,14 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class ReaderFile {
      public static void Reader() {
           String caminhoDoArquivo = "teste.txt";
-
+          ArrayList<Instruction> pipeline = new ArrayList<Instruction>();
+          MipsInstructions mips = new MipsInstructions();
           try {
                File arq = new File(caminhoDoArquivo);
 
@@ -32,11 +34,23 @@ public class ReaderFile {
                          cont++;
                     }
 
-                    instruction = new Instruction(temp[0], temp[1], temp[2], temp[3]);
+                    if (mips.isDest(temp[0])) {
+                         instruction = new Instruction(temp[0], temp[1], temp[3], temp[2]);
+                    } else {
+                         instruction = new Instruction(temp[0], temp[3], temp[1], temp[2]);
+                    }
 
-                    System.out.println(instruction.getAllValues());
+                    pipeline.add(instruction);
                }
 
+               for (Instruction instru : pipeline) {
+                    System.out.println(instru.getAllValues());
+               }
+              
+               System.out.println("========================================");
+               for (Instruction instru :  Bubble.insertBubble(pipeline)) {
+                    System.out.println(instru.getAllValues());
+               }
                scanner.close();
           } catch (FileNotFoundException e) {
                System.out.println("Erro ao ler o arquivo: " + e.getMessage());
