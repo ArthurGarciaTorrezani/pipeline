@@ -34,9 +34,9 @@ public class ReaderFile {
                          cont++;
                     }
 
-                    if (mips.isDest(temp[0])) {
+                    if (mips.isDest(temp[0])) { // formata para cada caso, esse  é para o primeiro registrador como destino
                          instruction = new Instruction(temp[0], temp[1], temp[3], temp[2]);
-                    } else {
+                    } else { // esse  é para o primeiro registrador como origem
                          instruction = new Instruction(temp[0], temp[3], temp[1], temp[2]);
                     }
 
