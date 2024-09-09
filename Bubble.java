@@ -1,72 +1,108 @@
 import java.util.ArrayList;
 
 public class Bubble {
-     public static ArrayList<Instruction> insertBubble(ArrayList<Instruction> pipeline) {
+     public static ArrayList<Instruction> implement(ArrayList<Instruction> pipeline) {
+
           ArrayList<Instruction> resposta = new ArrayList<>();
-          int tamanho = pipeline.size()-1;
-          for(int i = 0; i < tamanho;i++){
-               Instruction um = pipeline.get(i);
-               Instruction dois = pipeline.get(i+1);
+
+          int tamanho = pipeline.size() - 1; // 2
+
+          for (int i = 0; i < tamanho; i++) {
+               Instruction um = pipeline.get(i); // lw $t0, 1200($t1)
+               Instruction dois = pipeline.get(i + 1); // add $t0, $s2, $t0
                Instruction tres = null;
 
-               if(i == pipeline.size()-2){
+               if (i == pipeline.size() - 2) {
                     tres = null;
-               }else{
-                    tres = pipeline.get(i+2);
+               } else {
+                    tres = pipeline.get(i + 2); // sw $t0, 1200($t1)
                }
 
+               int quant = quantNops(um, dois, tres);
 
-               boolean igualA2 = false;
-               boolean igualA3 = false;
+               /*
+                * if(condicao pra ver qual vai usar){
+                * insertBubble(tres, quant, resposta);
+                * }else if(condicao){
+                * insertBubble(tres, quant, resposta);
+                * }else{
+                * insertReordenamento
+                * }
+                */
 
-               if(dois.getRegis2().matches(".*\\d+.*")){ // verifica se tem numero, se tiver ele compara onde tem registrador
-                    if(um.getRegis1().equals(dois.getRegis1()) || um.getRegis1().equals(dois.getRegis3())){ // verirfica todos os registradores da 2 intrucao
-                         igualA2 = true;
-                    }
-               }else{ // compara os registradores
-                    if(um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(dois.getRegis3())){ // verirfica todos os registradores da 2 intrucao
-                         igualA2 = true;
-                    }
-               }
+               insertBubble(um, quant, resposta);
 
-               if(tres != null){
-                    if(tres.getRegis2().matches(".*\\d+.*")){ // verifica se tem numero, se tiver ele compara onde tem registrador
-                         if(um.getRegis1().equals(tres.getRegis1()) || um.getRegis1().equals(tres.getRegis3())){ // verirfica todos os registradores da 2 intrucao
-                              igualA3 = true;
-                         }
-                    }else{ // compara os registradores
-                         if(um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(tres.getRegis3())){ // verirfica todos os registradores da 2 intrucao
-                              igualA3 = true;
-                         }
-                    }
+          }
+          resposta.add(pipeline.get(tamanho));
+          return resposta;
+     }
+
+     public static void insertBubble(Instruction instru, int quant, ArrayList<Instruction> resposta) {
+
+          if (quant == 0) {
+               resposta.add(instru);
+          }
+
+          if (quant == 2) {
+               resposta.add(instru);
+               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+
+          }
+
+          if (quant == 1) {
+               resposta.add(instru);
+               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+
+          }
+
+     }
+
+     public static void insertAdvance(Instruction instru, int quant, ArrayList<Instruction> resposta) {
+
+          MipsInstructions advance = new MipsInstructions();
+
+          if (quant == 0) {
+               resposta.add(instru);
+
+          }
+
+          if (quant == 1) {
+               resposta.add(instru);
+          }
+
+          if (quant == 2) {
+               if (advance.isExec(instru.getInstru())) {
+                    resposta.add(instru);
                }
-               
-               if(igualA2){
-                    resposta.add(um); // insere na lista da resposta
-                    resposta.add(new Instruction("nop", "nop", "nop", "nop"));
-                    resposta.add(new Instruction("nop", "nop", "nop", "nop"));
-                    // coloca 2 nop
-                    continue;
+               resposta.add(instru);
+               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+          }
+     }
+
+     private static int quantNops(Instruction um, Instruction dois, Instruction tres) {
+          if (dois.getRegis2().matches(".*\\d+.*")) {
+               if (um.getRegis1().equals(dois.getRegis1()) || um.getRegis1().equals(dois.getRegis3())) {
+                    return 2;
                }
-               if(igualA3){
-                    resposta.add(um); // insere na lista da resposta
-                    resposta.add(new Instruction("nop", "nop", "nop", "nop"));
-                    // coloca 1 nop
+          } else {
+               if (um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(dois.getRegis3())) {
+                    return 2;
                }
           }
-               resposta.add(pipeline.get(tamanho));
-               return resposta;
+
+          if (tres != null) {
+               if (tres.getRegis2().matches(".*\\d+.*")) {
+                    if (um.getRegis1().equals(tres.getRegis1()) || um.getRegis1().equals(tres.getRegis3())) {
+                         return 1;
+                    }
+               } else {
+                    if (um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(tres.getRegis3())) {
+                         return 1;
+                    }
+               }
+          }
+
+          return 0;
      }
 }
-
-// add $t1, $s2, $s1
-// lw $s2, 0($t1)
-
-// add $s1, $s2, $s3
-// sw $s1, 200($s4)
-
-// lb $s1, 200($s2)
-// add $s2, $s1, $s3
-
-// add $s1, $s2, $s3
-// add $s1, $s2, $s3

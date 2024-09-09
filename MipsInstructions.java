@@ -6,10 +6,12 @@ public class MipsInstructions {
     // Listas para armazenar as instruções de destino e de origem
     private List<String> destinationInstructions;
     private List<String> sourceInstructions;
+    private List<String> advanceExec;
 
     public MipsInstructions() {
         destinationInstructions = new ArrayList<>();
         sourceInstructions = new ArrayList<>();
+        advanceExec = new ArrayList<>();
 
         destinationInstructions.add("lb");
         destinationInstructions.add("lh");
@@ -66,11 +68,18 @@ public class MipsInstructions {
         sourceInstructions.add("jal");
     }
 
-    public boolean isDest(String instru){
-        if(destinationInstructions.contains(instru)){
+    public boolean isDest(String instru) {
+        if (destinationInstructions.contains(instru)) {
             return true;
-        }else{
-            return false;
         }
+        return false;
+
+    }
+
+    public boolean isExec(String instru) {
+        if (advanceExec.contains(instru)) {
+            return true;
+        }
+        return false;
     }
 }

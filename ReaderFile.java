@@ -37,7 +37,7 @@ public class ReaderFile {
                     if (mips.isDest(temp[0])) { // formata para cada caso, esse  é para o primeiro registrador como destino
                          instruction = new Instruction(temp[0], temp[1], temp[3], temp[2]);
                     } else { // esse  é para o primeiro registrador como origem
-                         instruction = new Instruction(temp[0], temp[3], temp[1], temp[2]);
+                         instruction = new Instruction(temp[0], temp[3], temp[1], temp[2]); // intru reg numero reg
                     }
 
                     pipeline.add(instruction);
@@ -48,9 +48,10 @@ public class ReaderFile {
                }
               
                System.out.println("========================================");
-               for (Instruction instru :  Bubble.insertBubble(pipeline)) {
+               for (Instruction instru :  Bubble.implement(pipeline)) {
                     System.out.println(instru.getAllValues());
                }
+               
                scanner.close();
           } catch (FileNotFoundException e) {
                System.out.println("Erro ao ler o arquivo: " + e.getMessage());
