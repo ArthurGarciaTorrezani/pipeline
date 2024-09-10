@@ -6,12 +6,12 @@ public class MipsInstructions {
     // Listas para armazenar as instruções de destino e de origem
     private List<String> destinationInstructions;
     private List<String> sourceInstructions;
-    private List<String> advanceExec;
+    private List<String> advanceMem;
 
     public MipsInstructions() {
         destinationInstructions = new ArrayList<>();
         sourceInstructions = new ArrayList<>();
-        advanceExec = new ArrayList<>();
+        advanceMem = new ArrayList<>();
 
         destinationInstructions.add("lb");
         destinationInstructions.add("lh");
@@ -66,6 +66,31 @@ public class MipsInstructions {
         sourceInstructions.add("bgezal");
         sourceInstructions.add("j");
         sourceInstructions.add("jal");
+        
+
+        advanceMem.add("lb");
+        advanceMem.add("lh");
+        advanceMem.add("lwl");
+        advanceMem.add("lw");
+        advanceMem.add("lbu");
+        advanceMem.add("lhu");
+        advanceMem.add("lwr");
+        advanceMem.add("sb");
+        advanceMem.add("sh");
+        advanceMem.add("swl");
+        advanceMem.add("sw");
+        advanceMem.add("swr");
+        advanceMem.add("j");
+        advanceMem.add("jal");
+        advanceMem.add("jr");
+        advanceMem.add("jalr");
+        advanceMem.add("sll");
+        advanceMem.add("srl");
+        advanceMem.add("sra");
+        advanceMem.add("sllv");
+        advanceMem.add("srlv");
+        advanceMem.add("srav");
+        
     }
 
     public boolean isDest(String instru) {
@@ -76,8 +101,8 @@ public class MipsInstructions {
 
     }
 
-    public boolean isExec(String instru) {
-        if (advanceExec.contains(instru)) {
+    public boolean isMem(String instru) {
+        if (advanceMem.contains(instru)) {
             return true;
         }
         return false;

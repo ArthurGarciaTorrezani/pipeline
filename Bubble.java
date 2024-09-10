@@ -20,18 +20,9 @@ public class Bubble {
 
                int quant = quantNops(um, dois, tres);
 
-               /*
-                * if(condicao pra ver qual vai usar){
-                * insertBubble(tres, quant, resposta);
-                * }else if(condicao){
-                * insertBubble(tres, quant, resposta);
-                * }else{
-                * insertReordenamento
-                * }
-                */
-
-               insertBubble(um, quant, resposta);
-
+               
+               insertAdvance(um, quant, resposta);
+               //insertBubble(um, quant, resposta);
           }
           resposta.add(pipeline.get(tamanho));
           return resposta;
@@ -72,11 +63,14 @@ public class Bubble {
           }
 
           if (quant == 2) {
-               if (advance.isExec(instru.getInstru())) {
+               if (advance.isMem(instru.getInstru())) {
+                    resposta.add(instru);
+                    resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+               }else{
                     resposta.add(instru);
                }
-               resposta.add(instru);
-               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+               
+
           }
      }
 
