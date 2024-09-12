@@ -42,10 +42,6 @@ public class ReaderFile {
 
                     pipeline.add(instruction);
                }
-
-               for (Instruction instru : pipeline) {
-                    System.out.println(instru.getAllValues());
-               }
               
                System.out.println("========================================");
                for (Instruction instru :  Bubble.implement(pipeline)) {
