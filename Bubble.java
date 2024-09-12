@@ -23,7 +23,8 @@ public class Bubble {
 
                // insertAdvance(um, quant, resposta)
                Instruction[] instructionsNops = createNops(pipeline, i);
-               insertBubble(um, quant, resposta, instructionsNops, nops);
+               //insertBubble(um, quant, resposta, instructionsNops, nops);
+               insertAdvance(um, quant, resposta, instructionsNops, nops);
           }
 
           resposta.add(pipeline.get(tamanho));
@@ -55,7 +56,7 @@ public class Bubble {
 
      }
 
-     public static void insertAdvance(Instruction instru, int quant, ArrayList<Instruction> resposta) {
+     public static void insertAdvance(Instruction instru, int quant, ArrayList<Instruction> resposta,  Instruction[] instructionsNops, ArrayList<Instruction> nops) {
 
           MipsInstructions advance = new MipsInstructions();
 
@@ -71,7 +72,8 @@ public class Bubble {
           if (quant == 2) {
                if (advance.isMem(instru.getInstru())) {
                     resposta.add(instru);
-                    resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+                    resposta.add(instructionsNops[2]);
+                    nops.add(instructionsNops[2]);
                } else {
                     resposta.add(instru);
                }
@@ -85,6 +87,11 @@ public class Bubble {
                if (resp.getInstru() == null) {
                     continue;
                }
+
+               if (dependence(i, resposta)) {
+                    continue;
+               }
+
                for (int j = 0; j < nops.size(); j++) {
                     Instruction nop = nops.get(j);
 
@@ -118,7 +125,7 @@ public class Bubble {
                for (int j = 0; j < nops.size(); j++) {
                     Instruction nop = nops.get(j);
                     if (nop.getInstru() != null) {
-                         System.out.println("VALORES: "+nop.getAllValues());
+                         System.out.println("VALORES: " + nop.getAllValues());
                          resposta.set(i, nop);
                          nops.remove(nop);
                          break;
@@ -128,9 +135,43 @@ public class Bubble {
 
           }
 
-         
      }
 
+     private static boolean dependence(int indexNum, ArrayList<Instruction> resposta) {
+          // Verifica os limites para evitar IndexOutOfBoundsException
+          Instruction principal = resposta.get(indexNum);
+      
+          // Limites de 15 posições antes e depois, garantindo que não ultrapassem os limites da lista
+          int inicio = Math.max(0, indexNum - 15);
+          int fim = Math.min(resposta.size() - 1, indexNum + 15);
+      
+          for (int i = inicio; i <= fim; i++) {
+              // Evita comparar o elemento com ele mesmo
+              if (i == indexNum) {
+                  continue;
+              }
+      
+              Instruction a = resposta.get(i); // Acessa corretamente o índice `i`
+      
+              // Verifica se a instrução não é nula
+              if (a.getInstru() == null) {
+                  continue;
+              }
+      
+              // Verifica a lógica baseada em `getRegis2` e `getRegis1`, como no código original
+              if (a.getRegis2().matches("^\\d+$")) {
+                  if (principal.getRegis1().equals(a.getRegis1()) || principal.getRegis1().equals(a.getRegis3())) {
+                      return true;
+                  }
+              } else {
+                  if (principal.getRegis1().equals(a.getRegis2()) || principal.getRegis1().equals(a.getRegis3())) {
+                      return true;
+                  }
+              }
+          }
+          return false;
+      }
+      
      private static int quantNops(Instruction um, Instruction dois, Instruction tres) {
 
           if (dois.getRegis2().matches("^\\d+$")) {
