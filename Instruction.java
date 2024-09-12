@@ -11,6 +11,14 @@ public class Instruction {
           this.regis3 = regis3;
      }
 
+     public void setRegis1(String regis1){
+          this.regis1 = regis1;
+     }
+
+     public void setRegis3(String regis3){
+          this.regis3 = regis3;
+     }
+
      public String getInstru() {
           return instru;
      }
