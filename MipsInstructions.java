@@ -101,6 +101,14 @@ public class MipsInstructions {
 
     }
 
+    public boolean isOri(String instru) {
+        if (sourceInstructions.contains(instru)) {
+            return true;
+        }
+        return false;
+
+    }
+
     public boolean isMem(String instru) {
         if (advanceMem.contains(instru)) {
             return true;

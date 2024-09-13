@@ -19,12 +19,18 @@ public class Bubble {
                     tres = pipeline.get(i + 2); // sw $t0, 1200($t1)
                }
 
+               if (um.getInstru().equals("nop")) {
+                    Instruction[] instructionsNopss = createNops(pipeline, i);
+                    um = instructionsNopss[2];
+                    nops.add(um);
+               }
+
                int quant = quantNops(um, dois, tres);
 
                // insertAdvance(um, quant, resposta)
                Instruction[] instructionsNops = createNops(pipeline, i);
-               //insertBubble(um, quant, resposta, instructionsNops, nops);
-               insertAdvance(um, quant, resposta, instructionsNops, nops);
+               insertBubble(um, quant, resposta, instructionsNops, nops);
+               // insertAdvance(um, quant, resposta, instructionsNops, nops);
           }
 
           resposta.add(pipeline.get(tamanho));
@@ -56,7 +62,8 @@ public class Bubble {
 
      }
 
-     public static void insertAdvance(Instruction instru, int quant, ArrayList<Instruction> resposta,  Instruction[] instructionsNops, ArrayList<Instruction> nops) {
+     public static void insertAdvance(Instruction instru, int quant, ArrayList<Instruction> resposta,
+               Instruction[] instructionsNops, ArrayList<Instruction> nops) {
 
           MipsInstructions advance = new MipsInstructions();
 
@@ -84,17 +91,19 @@ public class Bubble {
      public static void reordering(ArrayList<Instruction> resposta, ArrayList<Instruction> nops) {
           for (int i = 0; i < resposta.size(); i++) {
                Instruction resp = resposta.get(i);
+             
                if (resp.getInstru() == null) {
                     continue;
                }
-
+               
                if (dependence(i, resposta)) {
                     continue;
                }
+               
 
                for (int j = 0; j < nops.size(); j++) {
                     Instruction nop = nops.get(j);
-
+                  
                     if (nop.getInstru() != null) {
                          continue;
                     }
@@ -118,19 +127,16 @@ public class Bubble {
 
           for (int i = 0; i < resposta.size(); i++) {
                Instruction resp = resposta.get(i);
+               
                if (resp.getInstru() != null) { // verifica se é nop
                     continue;
                }
                // se for nop faz isso
                for (int j = 0; j < nops.size(); j++) {
                     Instruction nop = nops.get(j);
-                    if (nop.getInstru() != null) {
-                         System.out.println("VALORES: " + nop.getAllValues());
-                         resposta.set(i, nop);
-                         nops.remove(nop);
-                         break;
-                    }
-
+                    resposta.set(i, nop);
+                    nops.remove(nop);
+                    break;
                }
 
           }
@@ -140,38 +146,38 @@ public class Bubble {
      private static boolean dependence(int indexNum, ArrayList<Instruction> resposta) {
           // Verifica os limites para evitar IndexOutOfBoundsException
           Instruction principal = resposta.get(indexNum);
-      
-          // Limites de 15 posições antes e depois, garantindo que não ultrapassem os limites da lista
+
+          // Limites de 15 posições antes e depois, garantindo que não ultrapassem os
+          // limites da lista
           int inicio = Math.max(0, indexNum - 15);
           int fim = Math.min(resposta.size() - 1, indexNum + 15);
-      
+
           for (int i = inicio; i <= fim; i++) {
-              // Evita comparar o elemento com ele mesmo
-              if (i == indexNum) {
-                  continue;
-              }
-      
-              Instruction a = resposta.get(i); // Acessa corretamente o índice `i`
-      
-              // Verifica se a instrução não é nula
-              if (a.getInstru() == null) {
-                  continue;
-              }
-      
-              // Verifica a lógica baseada em `getRegis2` e `getRegis1`, como no código original
-              if (a.getRegis2().matches("^\\d+$")) {
-                  if (principal.getRegis1().equals(a.getRegis1()) || principal.getRegis1().equals(a.getRegis3())) {
-                      return true;
-                  }
-              } else {
-                  if (principal.getRegis1().equals(a.getRegis2()) || principal.getRegis1().equals(a.getRegis3())) {
-                      return true;
-                  }
-              }
+               // Evita comparar o elemento com ele mesmo
+               if (i == indexNum) {
+                    continue;
+               }
+
+               Instruction a = resposta.get(i); // Acessa corretamente o índice `i`
+
+               // Verifica se a instrução não é nula
+               if (a.getInstru() == null) {
+                    continue;
+               }
+
+               if (a.getRegis2().matches("^\\d+$")) {
+                    if (principal.getRegis1().equals(a.getRegis1()) || principal.getRegis1().equals(a.getRegis3())) {
+                         return true;
+                    }
+               } else {
+                    if (principal.getRegis1().equals(a.getRegis2()) || principal.getRegis1().equals(a.getRegis3())) {
+                         return true;
+                    }
+               }
           }
           return false;
-      }
-      
+     }
+
      private static int quantNops(Instruction um, Instruction dois, Instruction tres) {
 
           if (dois.getRegis2().matches("^\\d+$")) {
@@ -230,7 +236,15 @@ public class Bubble {
           // origem
           origemNop1 += "/" + principal.getRegis1() + "/" + antPrincipal.getRegis1();
           origemNop2 += "/" + principal.getRegis1();
-          origemNop3 += "/" + principal.getRegis1() + "/" + antPrincipal.getRegis1();
+          if (principal.getInstru().equals("nop")) {
+               if (numIndex > 1) {
+                    Instruction antAntPrincipal = pipeline.get(numIndex - 2);
+                    origemNop3 += "/" + antAntPrincipal.getRegis1() + "/" + antPrincipal.getRegis1();
+               }
+          } else {
+               origemNop3 += "/" + principal.getRegis1() + "/" + antPrincipal.getRegis1();
+          }
+
           ///////////////
           // destino
           if (posPrincipal.getRegis2().matches("^\\d+$")) {
@@ -266,9 +280,3 @@ public class Bubble {
           return nops;
      }
 }
-
-// 1 1
-// 1 2
-// 1 2
-// 1
-// 1
