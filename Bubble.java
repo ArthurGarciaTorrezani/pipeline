@@ -4,7 +4,6 @@ public class Bubble {
      public static ArrayList<Instruction> implement(ArrayList<Instruction> pipeline) {
 
           ArrayList<Instruction> resposta = new ArrayList<>();
-          ArrayList<Instruction> nops = new ArrayList<>();
 
           int tamanho = pipeline.size() - 1; // 2
 
@@ -19,27 +18,19 @@ public class Bubble {
                     tres = pipeline.get(i + 2); // sw $t0, 1200($t1)
                }
 
-               if (um.getInstru().equals("nop")) {
-                    Instruction[] instructionsNopss = createNops(pipeline, i);
-                    um = instructionsNopss[2];
-                    nops.add(um);
-               }
-
                int quant = quantNops(um, dois, tres);
 
                // insertAdvance(um, quant, resposta)
-               Instruction[] instructionsNops = createNops(pipeline, i);
-               insertBubble(um, quant, resposta, instructionsNops, nops);
-               // insertAdvance(um, quant, resposta, instructionsNops, nops);
+               // insertBubble(um, quant, resposta);
+               insertAdvance(um, quant, resposta);
           }
 
           resposta.add(pipeline.get(tamanho));
-          reordering(resposta, nops);
+          reordering(resposta);
           return resposta;
      }
 
-     public static void insertBubble(Instruction instru, int quant, ArrayList<Instruction> resposta,
-               Instruction[] instructionsNops, ArrayList<Instruction> nops) {
+     public static void insertBubble(Instruction instru, int quant, ArrayList<Instruction> resposta) {
 
           if (quant == 0) {
                resposta.add(instru);
@@ -47,23 +38,19 @@ public class Bubble {
 
           if (quant == 2) {
                resposta.add(instru);
-               resposta.add(instructionsNops[0]);
-               resposta.add(instructionsNops[1]);
-               nops.add(instructionsNops[0]);
-               nops.add(instructionsNops[1]);
+               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
 
           }
 
           if (quant == 1) {
                resposta.add(instru);
-               resposta.add(instructionsNops[2]);
-               nops.add(instructionsNops[2]);
+               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
           }
 
      }
 
-     public static void insertAdvance(Instruction instru, int quant, ArrayList<Instruction> resposta,
-               Instruction[] instructionsNops, ArrayList<Instruction> nops) {
+     public static void insertAdvance(Instruction instru, int quant, ArrayList<Instruction> resposta) {
 
           MipsInstructions advance = new MipsInstructions();
 
@@ -79,8 +66,7 @@ public class Bubble {
           if (quant == 2) {
                if (advance.isMem(instru.getInstru())) {
                     resposta.add(instru);
-                    resposta.add(instructionsNops[2]);
-                    nops.add(instructionsNops[2]);
+                    resposta.add(new Instruction("nop", "nop", "nop", "nop"));
                } else {
                     resposta.add(instru);
                }
@@ -88,195 +74,168 @@ public class Bubble {
           }
      }
 
-     public static void reordering(ArrayList<Instruction> resposta, ArrayList<Instruction> nops) {
-          for (int i = 0; i < resposta.size(); i++) {
-               Instruction resp = resposta.get(i);
-             
-               if (resp.getInstru() == null) {
-                    continue;
-               }
-               
-               if (dependence(i, resposta)) {
-                    continue;
-               }
-               
-
-               for (int j = 0; j < nops.size(); j++) {
-                    Instruction nop = nops.get(j);
-                  
-                    if (nop.getInstru() != null) {
-                         continue;
-                    }
-
-                    if (nop.getRegis1().contains(resp.getRegis1())) {
-                         continue;
-                    }
-                    if (nop.getRegis3().contains(resp.getRegis2())) {
-                         continue;
-                    }
-                    if (nop.getRegis3().contains(resp.getRegis3())) {
-                         continue;
-                    }
-
-                    resposta.remove(resp);
-                    nops.set(j, resp);
-                    i--;
-                    break;
-               }
-          }
+     public static void reordering(ArrayList<Instruction> resposta) {
 
           for (int i = 0; i < resposta.size(); i++) {
-               Instruction resp = resposta.get(i);
-               
-               if (resp.getInstru() != null) { // verifica se é nop
-                    continue;
-               }
-               // se for nop faz isso
-               for (int j = 0; j < nops.size(); j++) {
-                    Instruction nop = nops.get(j);
-                    resposta.set(i, nop);
-                    nops.remove(nop);
-                    break;
+               Instruction base = resposta.get(i);
+
+               if (base.getInstru() != "nop") {
+                    if (!dependence(i, resposta, 15)) {
+                         for (int j = 0; j < resposta.size(); j++) {
+
+                              if (resposta.get(j).getInstru() == "nop") {
+
+                                   Instruction comparada = resposta.get(j);
+
+                                   if (comparada.getInstru().equals("nop")) {
+                                        if (!dependence2(j, resposta, 2,i)) {
+                                             resposta.remove(base);
+                                             resposta.set(j, base);
+                                             break;
+                                        }
+
+                                   }
+
+                              }
+
+                         }
+                    }
                }
 
           }
 
      }
 
-     private static boolean dependence(int indexNum, ArrayList<Instruction> resposta) {
-          // Verifica os limites para evitar IndexOutOfBoundsException
+     private static boolean dependence(int indexNum, ArrayList<Instruction> resposta, int quant) {
           Instruction principal = resposta.get(indexNum);
 
-          // Limites de 15 posições antes e depois, garantindo que não ultrapassem os
-          // limites da lista
-          int inicio = Math.max(0, indexNum - 15);
-          int fim = Math.min(resposta.size() - 1, indexNum + 15);
+          int inicio = Math.max(0, indexNum - quant);
+          int fim = Math.min(resposta.size() - 1, indexNum + quant);
 
           for (int i = inicio; i <= fim; i++) {
-               // Evita comparar o elemento com ele mesmo
+
                if (i == indexNum) {
                     continue;
                }
 
-               Instruction a = resposta.get(i); // Acessa corretamente o índice `i`
+               Instruction a = resposta.get(i); // a ser comparada
 
-               // Verifica se a instrução não é nula
                if (a.getInstru() == null) {
                     continue;
                }
 
-               if (a.getRegis2().matches("^\\d+$")) {
-                    if (principal.getRegis1().equals(a.getRegis1()) || principal.getRegis1().equals(a.getRegis3())) {
-                         return true;
+               if (i < indexNum) {
+                    if (principal.getRegis2().matches("^\\d+$")) {
+                         if (principal.getRegis1().equals(a.getRegis1())
+                                   || principal.getRegis3().equals(a.getRegis1())) {
+                              return true;
+                         }
+                    } else {
+                         if (principal.getRegis2().equals(a.getRegis1())
+                                   || principal.getRegis3().equals(a.getRegis1())) {
+                              return true;
+                         }
                     }
                } else {
-                    if (principal.getRegis1().equals(a.getRegis2()) || principal.getRegis1().equals(a.getRegis3())) {
-                         return true;
+
+                    if (a.getRegis2().matches("^\\d+$")) {
+                         if (principal.getRegis1().equals(a.getRegis1())
+                                   || principal.getRegis1().equals(a.getRegis3())) {
+                              return true;
+                         }
+                    } else {
+                         if (principal.getRegis1().equals(a.getRegis2())
+                                   || principal.getRegis1().equals(a.getRegis3())) {
+                              return true;
+                         }
                     }
                }
+
+          }
+          return false;
+     }
+
+     private static boolean dependence2(int indexNum, ArrayList<Instruction> resposta, int quant, int indexNum2) {
+          Instruction principal = resposta.get(indexNum2);
+
+          int inicio = Math.max(0, indexNum - quant);
+          int fim = Math.min(resposta.size() - 1, indexNum + quant);
+
+          for (int i = inicio; i <= fim; i++) {
+
+               if (i == indexNum) {
+                    continue;
+               }
+
+               Instruction a = resposta.get(i); // a ser comparada
+
+               if (a.getInstru() == null) {
+                    continue;
+               }
+
+               if (i < indexNum2) {
+                    if (principal.getRegis2().matches("^\\d+$")) {
+                         if (principal.getRegis1().equals(a.getRegis1())
+                                   || principal.getRegis3().equals(a.getRegis1())) {
+                              return true;
+                         }
+                    } else {
+                         if (principal.getRegis2().equals(a.getRegis1())
+                                   || principal.getRegis3().equals(a.getRegis1())) {
+                              return true;
+                         }
+                    }
+               } else {
+
+                    if (a.getRegis2().matches("^\\d+$")) {
+                         if (principal.getRegis1().equals(a.getRegis1())
+                                   || principal.getRegis1().equals(a.getRegis3())) {
+                              return true;
+                         }
+                    } else {
+                         if (principal.getRegis1().equals(a.getRegis2())
+                                   || principal.getRegis1().equals(a.getRegis3())) {
+                              return true;
+                         }
+                    }
+               }
+
           }
           return false;
      }
 
      private static int quantNops(Instruction um, Instruction dois, Instruction tres) {
 
-          if (dois.getRegis2().matches("^\\d+$")) {
-               if (um.getRegis1().equals(dois.getRegis1()) || um.getRegis1().equals(dois.getRegis3())) {
-                    return 2;
+          if (um.getInstru() != "nop") {
+               if (dois.getInstru() != "nop") {
+                    if (dois.getRegis2().matches("^\\d+$")) {
+                         if (um.getRegis1().equals(dois.getRegis1()) || um.getRegis1().equals(dois.getRegis3())) {
+                              return 2;
+                         }
+                    } else {
+                         if (um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(dois.getRegis3())) {
+                              return 2;
+                         }
+                    }
                }
-          } else {
-               if (um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(dois.getRegis3())) {
-                    return 2;
-               }
-          }
 
-          if (tres != null) {
-               if (tres.getRegis2().matches("^\\d+$")) {
-                    if (um.getRegis1().equals(tres.getRegis1()) || um.getRegis1().equals(tres.getRegis3())) {
-                         return 1;
+               if (tres != null) {
+                    if (tres.getInstru() != "nop") {
+                         if (tres.getRegis2().matches("^\\d+$")) {
+                              if (um.getRegis1().equals(tres.getRegis1()) || um.getRegis1().equals(tres.getRegis3())) {
+                                   return 1;
+                              }
+                         } else {
+                              if (um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(tres.getRegis3())) {
+                                   return 1;
+                              }
+                         }
                     }
-               } else {
-                    if (um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(tres.getRegis3())) {
-                         return 1;
-                    }
+
                }
           }
 
           return 0;
      }
 
-     private static Instruction[] createNops(ArrayList<Instruction> pipeline, int numIndex) {
-
-          Instruction nop1 = new Instruction(null, null, null, null);
-          Instruction nop2 = new Instruction(null, null, null, null);
-          Instruction nop3 = new Instruction(null, null, null, null);
-
-          Instruction antPrincipal = new Instruction("void", "void", "void", "void");
-          Instruction posPosPrincipal = new Instruction("void", "void", "void", "void");
-
-          if (numIndex != 0) {
-               antPrincipal = pipeline.get(numIndex - 1);
-          }
-
-          if (numIndex < pipeline.size() - 2) {
-               posPosPrincipal = pipeline.get(numIndex + 2);
-          }
-
-          Instruction principal = pipeline.get(numIndex);
-          Instruction posPrincipal = pipeline.get(numIndex + 1);
-
-          String destNop1 = "";
-          String destNop2 = "";
-          String destNop3 = "";
-
-          String origemNop1 = "";
-          String origemNop2 = "";
-          String origemNop3 = "";
-
-          // origem
-          origemNop1 += "/" + principal.getRegis1() + "/" + antPrincipal.getRegis1();
-          origemNop2 += "/" + principal.getRegis1();
-          if (principal.getInstru().equals("nop")) {
-               if (numIndex > 1) {
-                    Instruction antAntPrincipal = pipeline.get(numIndex - 2);
-                    origemNop3 += "/" + antAntPrincipal.getRegis1() + "/" + antPrincipal.getRegis1();
-               }
-          } else {
-               origemNop3 += "/" + principal.getRegis1() + "/" + antPrincipal.getRegis1();
-          }
-
-          ///////////////
-          // destino
-          if (posPrincipal.getRegis2().matches("^\\d+$")) {
-               destNop1 += "/" + posPrincipal.getRegis1() + "/" + posPrincipal.getRegis3();
-               destNop2 += "/" + posPrincipal.getRegis1() + "/" + posPrincipal.getRegis3();
-               destNop3 += "/" + posPrincipal.getRegis1() + "/" + posPrincipal.getRegis3();
-          } else {
-               destNop1 += "/" + posPrincipal.getRegis2() + "/" + posPrincipal.getRegis3();
-               destNop2 += "/" + posPrincipal.getRegis2() + "/" + posPrincipal.getRegis3();
-               destNop3 += "/" + posPrincipal.getRegis2() + "/" + posPrincipal.getRegis3();
-          }
-
-          if (posPosPrincipal != null) {
-               if (posPosPrincipal.getRegis2().matches("^\\d+$")) {
-                    destNop2 += "/" + posPosPrincipal.getRegis1() + "/" + posPosPrincipal.getRegis3();
-                    destNop3 += "/" + posPosPrincipal.getRegis1() + "/" + posPosPrincipal.getRegis3();
-               } else {
-                    destNop2 += "/" + posPosPrincipal.getRegis2() + "/" + posPosPrincipal.getRegis3();
-                    destNop3 += "/" + posPosPrincipal.getRegis2() + "/" + posPosPrincipal.getRegis3();
-               }
-          }
-
-          nop1.setRegis1(destNop1);
-          nop1.setRegis3(origemNop1);
-
-          nop2.setRegis1(destNop2);
-          nop2.setRegis3(origemNop2);
-
-          nop3.setRegis1(destNop3);
-          nop3.setRegis3(origemNop3);
-
-          Instruction[] nops = { nop1, nop2, nop3 };
-          return nops;
-     }
 }

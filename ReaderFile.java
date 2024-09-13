@@ -37,7 +37,7 @@ public class ReaderFile {
                                                 // destino
                          instruction = new Instruction(temp[0], temp[1], temp[3], temp[2]);
                     } else if (temp[0].equals("nop")) {
-                         instruction = new Instruction("nop", "void", "void", "void");
+                         instruction = new Instruction("nop", "nop", "nop", "nop");
                     } else if(mips.isOri(temp[0])){ // esse é para o primeiro registrador como origem
                          instruction = new Instruction(temp[0], temp[3], temp[1], temp[2]); // intru reg numero reg
                     }else{
