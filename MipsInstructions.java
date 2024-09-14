@@ -66,7 +66,10 @@ public class MipsInstructions {
         sourceInstructions.add("bgezal");
         sourceInstructions.add("j");
         sourceInstructions.add("jal");
-        
+        sourceInstructions.add("beq");
+        sourceInstructions.add("bne");
+        sourceInstructions.add("blez");
+        sourceInstructions.add("btgz");
 
         advanceMem.add("lb");
         advanceMem.add("lh");
