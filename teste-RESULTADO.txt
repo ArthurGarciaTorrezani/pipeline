@@ -1,6 +1,6 @@
-add t0 s2  
+lw s1 230 zero
+sw t0 234 zero
+lw s2 0 t1
 nop nop nop nop
-lw t0 1200  
 nop nop nop nop
-nop nop nop nop
-sw t0 1200  
+add t1 s2 s1

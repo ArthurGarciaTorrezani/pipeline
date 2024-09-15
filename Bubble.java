@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Bubble {
-     public static ArrayList<Instruction> implement(ArrayList<Instruction> pipeline) {
+     public static ArrayList<Instruction> implement(ArrayList<Instruction> pipeline, String execs) {
 
           ArrayList<Instruction> resposta = new ArrayList<>();
 
@@ -19,15 +19,24 @@ public class Bubble {
                }
 
                int quant = quantNops(um, dois, tres);
+             
+               if (execs.contains("01") || execs.contains("02") || execs.contains("05") || execs.contains("06")
+                         || execs.contains("07")) {
+                    insertBubble(um, quant, resposta);
+               }
 
-              
-               // insertAdvance(um, quant, resposta);
-               insertBubble(um, quant, resposta);
-
+               if (execs.contains("03") || execs.contains("04") || execs.contains("08") || execs.contains("09")
+                         || execs.contains("10")) {
+                    insertAdvance(um, quant, resposta);
+               }
           }
 
           resposta.add(pipeline.get(tamanho));
-          reordering(resposta);
+          if (execs.contains("05") || execs.contains("06") || execs.contains("07") || execs.contains("08")
+                    || execs.contains("09") || execs.contains("10")) {
+               reordering(resposta);
+          }
+
           return resposta;
      }
 
@@ -78,7 +87,7 @@ public class Bubble {
 
           for (int i = 0; i < resposta.size(); i++) {
                Instruction base = resposta.get(i);
-               if (!base.getInstru().equals("nop")) { 
+               if (!base.getInstru().equals("nop")) {
                     if (!dependence(i, resposta, 15)) {
                          for (int j = 0; j < resposta.size(); j++) {
                               if (resposta.get(j).getInstru().equals("nop")) { // com quem compara

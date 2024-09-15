@@ -1,0 +1,7 @@
+lw t0 1200 t1
+add t7 s7 t7
+nop nop nop nop
+add t0 s2 t0
+nop nop nop nop
+nop nop nop nop
+sw t0 1200 t1

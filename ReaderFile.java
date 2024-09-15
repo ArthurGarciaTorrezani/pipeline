@@ -3,6 +3,11 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -39,8 +44,8 @@ public class ReaderFile {
                     pipeline.add(instruction);
                }
               
-               System.out.println("========================================");
-               for (Instruction instru :  Bubble.implement(pipeline)) {
+           
+               for (Instruction instru :  Bubble.implement(pipeline, arquivo)) {
                     System.out.println(instru.getAllValues());
                     conteudo += instru.getAllValues();
                     conteudo += "\n";
@@ -48,6 +53,25 @@ public class ReaderFile {
                bf.close();
                criaArquivo(conteudo, arquivo);
 
+    }
+
+    public static void openDir() {
+        Path dir = Paths.get("arquivos");
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+            for (Path file : stream) {
+                if (Files.isRegularFile(file)) {
+                    Path fileName = file.getFileName();
+                    String fileNameStr = file.getFileName().toString();
+                    System.out.println("========================================");
+                    System.out.printf("Open file: %s\n", fileNameStr);
+
+                    Reader("arquivos/" + fileName);
+                }
+            }
+        } catch (IOException | DirectoryIteratorException e) {
+            System.err.printf("Error opening directory: %s\n", e);
+        }
     }
 
     public static void criaArquivo(String conteudo, String titulo) throws IOException{ // Criação do arquivo de resultado.
