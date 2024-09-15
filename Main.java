@@ -1,6 +1,7 @@
+import java.io.IOException;
+
 public class Main {
-     public static void main(String[] args) {
-          ReaderFile.Reader();
+     public static void main(String[] args) throws IOException {
+          ReaderFile.Reader("teste.txt");
      }
-     
 }

@@ -20,9 +20,10 @@ public class Bubble {
 
                int quant = quantNops(um, dois, tres);
 
+              
                // insertAdvance(um, quant, resposta);
                insertBubble(um, quant, resposta);
-               // insertAdvance(um, quant, resposta);
+
           }
 
           resposta.add(pipeline.get(tamanho));
@@ -77,9 +78,7 @@ public class Bubble {
 
           for (int i = 0; i < resposta.size(); i++) {
                Instruction base = resposta.get(i);
-             
-               if (!base.getInstru().equals("nop")) {
-                   
+               if (!base.getInstru().equals("nop")) { 
                     if (!dependence(i, resposta, 15)) {
                          for (int j = 0; j < resposta.size(); j++) {
                               if (resposta.get(j).getInstru().equals("nop")) { // com quem compara
@@ -88,8 +87,7 @@ public class Bubble {
                                         if (!dependence2(j, resposta, 2, i)) {
                                              resposta.set(j, base);
                                              resposta.remove(i);
-                                             i--; 
-                                             break; 
+                                             break;
                                         }
                                    }
                               }
@@ -107,10 +105,6 @@ public class Bubble {
           int inicio = Math.max(0, indexNum - quant);
           int fim = Math.min(resposta.size() - 1, indexNum + quant);
 
-          if(principal.getInstru().equals("sw")){
-               System.out.println(principal.getAllValues() + " a");
-          }
-
           for (int i = inicio; i <= fim; i++) {
                if (i == indexNum) {
                     continue;
@@ -121,7 +115,7 @@ public class Bubble {
                if (a.getInstru() == null) {
                     continue;
                }
-            
+
                if (i < indexNum) {
                     if (test2(a, principal, mips)) {
                          return true;
@@ -183,7 +177,7 @@ public class Bubble {
 
                if (tres != null) {
                     if (tres.getInstru() != "nop") {
-                         if (test3(um, tres, mips))
+                         if (test2(um, tres, mips))
                               return 1;
                     }
 
@@ -193,48 +187,28 @@ public class Bubble {
           return 0;
      }
 
-     private static boolean test2(Instruction um, Instruction dois, MipsInstructions mips) {
-          
-          if (mips.isDest(um.getInstru()) && mips.isDest(dois.getInstru())) {
-               if (um.getRegis1().equals(dois.getRegis2()) || um.getRegis1().equals(dois.getRegis3())) {
+     private static boolean test2(Instruction um, Instruction comparada, MipsInstructions mips) {
+
+          if (mips.isDest(um.getInstru()) && mips.isDest(comparada.getInstru())) {
+               if (um.getRegis1().equals(comparada.getRegis2()) || um.getRegis1().equals(comparada.getRegis3())) {
                     return true;
                }
           }
 
-          if (mips.isDest(um.getInstru()) && !mips.isDest(dois.getInstru())) {
-               if (um.getRegis1().equals(dois.getRegis1()) || um.getRegis1().equals(dois.getRegis3())) {
+          if (mips.isDest(um.getInstru()) && !mips.isDest(comparada.getInstru())) {
+               if (um.getRegis1().equals(comparada.getRegis1()) || um.getRegis1().equals(comparada.getRegis2())
+                         || um.getRegis1().equals(comparada.getRegis3())) {
                     return true;
                }
           }
 
-          if (!mips.isDest(um.getInstru()) && mips.isDest(dois.getInstru())) {
-               if (um.getRegis2().equals(dois.getRegis2()) || um.getRegis3().equals(dois.getRegis3())) {
-                    return true;
-               }
-          }
-
-          return false;
-     }
-
-     private static boolean test3(Instruction um, Instruction tres, MipsInstructions mips) {
-          if (mips.isDest(um.getInstru()) && mips.isDest(tres.getInstru())) {
-               if (um.getRegis1().equals(tres.getRegis2()) || um.getRegis1().equals(tres.getRegis3())) {
-                    return true;
-               }
-          }
-
-          if (mips.isDest(um.getInstru()) && !mips.isDest(tres.getInstru())) {
-               if (um.getRegis1().equals(tres.getRegis1()) || um.getRegis1().equals(tres.getRegis3())) {
-                    return true;
-               }
-          }
-
-          if (!mips.isDest(um.getInstru()) && mips.isDest(tres.getInstru())) {
-               if (um.getRegis2().equals(tres.getRegis2()) || um.getRegis3().equals(tres.getRegis3())) {
+          if (!mips.isDest(um.getInstru()) && mips.isDest(comparada.getInstru())) {
+               if (um.getRegis2().equals(comparada.getRegis2()) || um.getRegis3().equals(comparada.getRegis3())) {
                     return true;
                }
           }
 
           return false;
      }
+
 }

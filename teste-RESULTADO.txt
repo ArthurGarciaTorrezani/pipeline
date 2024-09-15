@@ -1,0 +1,6 @@
+add t0 s2  
+nop nop nop nop
+lw t0 1200  
+nop nop nop nop
+nop nop nop nop
+sw t0 1200  

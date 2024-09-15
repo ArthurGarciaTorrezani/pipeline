@@ -1,43 +1,33 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class ReaderFile {
-     public static void Reader() {
-          String caminhoDoArquivo = "teste.txt";
-          ArrayList<Instruction> pipeline = new ArrayList<Instruction>();
-
-          try {
-               File arq = new File(caminhoDoArquivo);
-
-               if (!arq.exists()) {
-                    System.out.println("O arquivo não existe!");
-                    return;
-               }
-
-               Scanner scanner = new Scanner(arq);
-
-               Instruction instruction;
-
-               while (scanner.hasNextLine()) {
-
-                    String line = scanner.nextLine();
-
-                    StringTokenizer regis = new StringTokenizer(line, ",$() ");
+    
+    public static void Reader(String arquivo) throws IOException{ // Leitura do arquivo inserido na "principal".
+        BufferedReader bf = new BufferedReader(new FileReader(arquivo));
+        String linha;
+        String conteudo = "";
+        ArrayList<Instruction> pipeline = new ArrayList<Instruction>();
+      
+        Instruction instruction;
+        while((linha = bf.readLine()) != null){
+          StringTokenizer regis = new StringTokenizer(linha, ",$() ");
 
                     String[] temp = new String[4];
                     int cont = 0;
                     while (regis.hasMoreTokens()) {
-                         String teste = regis.nextToken().toLowerCase();
-                         temp[cont] = teste;
+                         temp[cont] = regis.nextToken().toLowerCase();
                          cont++;
                     }
-
-                    for (int i = 0; i < 4; i++) {
-                         if (temp[i] == null) {
-                              temp[i] = "void";
+                    
+                    for(int i = 0;i<4;i++){
+                         if(temp[i] == null){
+                              temp[i] = " ";
                          }
                     }
                     if (temp[0].equals("nop")) {
@@ -48,15 +38,28 @@ public class ReaderFile {
 
                     pipeline.add(instruction);
                }
-
+              
                System.out.println("========================================");
-               for (Instruction instru : Bubble.implement(pipeline)) {
+               for (Instruction instru :  Bubble.implement(pipeline)) {
                     System.out.println(instru.getAllValues());
+                    conteudo += instru.getAllValues();
+                    conteudo += "\n";
                }
+               bf.close();
+               criaArquivo(conteudo, arquivo);
 
-               scanner.close();
-          } catch (FileNotFoundException e) {
-               System.out.println("Erro ao ler o arquivo: " + e.getMessage());
-          }
-     }
+    }
+
+    public static void criaArquivo(String conteudo, String titulo) throws IOException{ // Criação do arquivo de resultado.
+
+        titulo = titulo.split(".txt")[0];
+        titulo += "-RESULTADO.txt";
+        BufferedWriter out = new BufferedWriter(new FileWriter(titulo));
+        out.write(conteudo);
+        out.flush();
+        out.close();
+
+    }
+
+
 }
