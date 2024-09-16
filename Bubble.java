@@ -20,20 +20,24 @@ public class Bubble {
 
                int quant = quantNops(um, dois, tres);
 
-               if (execs.equals("TESTE-01")|| execs.equals("TESTE-02") || execs.equals("TESTE-05") || execs.equals("TESTE-06")
-                         || execs.equals("TESTE-07")) {
+               if (execs.equals("TESTE-01.txt") || execs.equals("TESTE-02.txt") || execs.equals("TESTE-05.txt")
+                         || execs.equals("TESTE-06.txt")
+                         || execs.equals("TESTE-07.txt")) {
                     insertBubble(um, quant, resposta);
                }
 
-               if (execs.contains("03") || execs.contains("04") || execs.contains("08") || execs.contains("09")
-                         || execs.contains("10")) {
+               if (execs.equals("TESTE-03.txt") || execs.equals("TESTE-04.txt") || execs.equals("TESTE-08.txt")
+                         || execs.equals("TESTE-09.txt")
+                         || execs.contains("TESTE-10.txt")) {
                     insertAdvance(um, quant, resposta);
                }
           }
 
           resposta.add(pipeline.get(tamanho));
-          if (execs.contains("05") || execs.contains("06") || execs.contains("07") || execs.contains("08")
-                    || execs.contains("09") || execs.contains("10")) {
+
+          if (execs.equals("TESTE-05.txt") || execs.equals("TESTE-06.txt") || execs.equals("TESTE-07.txt")
+                    || execs.equals("TESTE-08.txt")
+                    || execs.equals("TESTE-09.txt") || execs.equals("TESTE-10.txt")) {
                reordering(resposta);
           }
 
@@ -48,14 +52,14 @@ public class Bubble {
 
           if (quant == 2) {
                resposta.add(instru);
-               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
-               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+               resposta.add(new Instruction("nop", "nop", "nop", "nop", "nop"));
+               resposta.add(new Instruction("nop", "nop", "nop", "nop", "nop"));
 
           }
 
           if (quant == 1) {
                resposta.add(instru);
-               resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+               resposta.add(new Instruction("nop", "nop", "nop", "nop", "nop"));
           }
 
      }
@@ -75,7 +79,7 @@ public class Bubble {
           if (quant == 2) {
                if (advance.isMem(instru.getInstru())) {
                     resposta.add(instru);
-                    resposta.add(new Instruction("nop", "nop", "nop", "nop"));
+                    resposta.add(new Instruction("nop", "nop", "nop", "nop", "nop"));
                } else {
                     resposta.add(instru);
                }
@@ -84,21 +88,21 @@ public class Bubble {
 
      public static void reordering(ArrayList<Instruction> resposta) {
 
-          for (int i = 0; i < resposta.size(); i++) { // pegar a instrucao principal
+          for (int i = 0; i < resposta.size(); i++) { 
+
                Instruction base = resposta.get(i);
+
                char firstLetter = base.getInstru().charAt(0);
+
                if (!base.getInstru().equals("nop")) {
                     if (firstLetter == 'j') {
                          resposta.add(0, base);
-                         i += 1;
-                         resposta.remove(i);
+                         resposta.remove(i + 1);
                     } else {
-                         if (!dependence(i, resposta, 15)) {
-
+                         if (!dependence(i, resposta, 15)) { // 0 1 2 3 
                               if (firstLetter == 'b') {
                                    resposta.add(0, base);
-                                   i += 1;
-                                   resposta.remove(i);
+                                   resposta.remove(i + 1);
                               } else {
                                    for (int j = 0; j < resposta.size(); j++) { // pegar a isntrucao a ser comparada
                                         if (resposta.get(j).getInstru().equals("nop")) { // com quem compara
@@ -120,6 +124,22 @@ public class Bubble {
                }
           }
 
+         
+          try{
+               char firstLetter = resposta.get(resposta.size()-1).getInstru().charAt(0);
+               if(firstLetter == 'j'){
+                    resposta.add(0,resposta.get(resposta.size()-1));
+                    resposta.remove(resposta.size()-1);
+               }
+               if(firstLetter == 'b'){
+                    resposta.add(0,resposta.get(resposta.size()-1));
+                    resposta.remove(resposta.size()-1);
+               }
+     
+          }catch(Error error){
+               System.out.println(" ");
+          }
+          
      }
 
      private static boolean dependence(int indexNum, ArrayList<Instruction> resposta, int quant) {
@@ -156,7 +176,9 @@ public class Bubble {
           return false;
      }
 
-     private static boolean conflito(int indexNum, ArrayList<Instruction> resposta, int quant, int indexNum2) {
+     private static boolean conflito(int indexNum, ArrayList<Instruction> resposta, int quant, int indexNum2) { // so
+                                                                                                                // pro
+                                                                                                                // reordebnamento
           Instruction principal = resposta.get(indexNum2);
           MipsInstructions mips = new MipsInstructions();
           int inicio = Math.max(0, indexNum - quant);

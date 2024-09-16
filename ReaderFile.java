@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 
 public class ReaderFile {
 
-    public static void Reader(String arquivo) throws IOException { // Leitura do arquivo inserido na "principal".
+    public static void Reader(String arquivo, String fileName) throws IOException { // Leitura do arquivo inserido na "principal".
         BufferedReader bf = new BufferedReader(new FileReader(arquivo));
         String linha;
         String content = "";
@@ -37,15 +37,15 @@ public class ReaderFile {
             }
 
             if (temp[0].equals("nop")) {
-                instruction = new Instruction("nop", "nop", "nop", "nop");
+                instruction = new Instruction("nop", "nop", "nop", "nop", "nop");
             } else {
-                instruction = new Instruction(temp[0], temp[1], temp[3], temp[2]);
+                instruction = new Instruction(temp[0], temp[1], temp[3], temp[2], linha);
             }
 
             pipeline.add(instruction);
         }
-
-        for (Instruction instru : Bubble.implement(pipeline, arquivo)) {
+        
+        for (Instruction instru : Bubble.implement(pipeline, fileName)) {
             System.out.println(instru.getAllValues());
             content += instru.getAllValues();
             content += "\n";
@@ -65,8 +65,8 @@ public class ReaderFile {
                     String fileNameStr = file.getFileName().toString();
                     System.out.println("========================================");
                     System.out.printf("Open file: %s\n", fileNameStr);
-
-                    Reader("arquivos/" + fileName);
+                    String teste = "arquivos/" + fileName;
+                    Reader(teste, fileNameStr);
                 }
             }
         } catch (IOException | DirectoryIteratorException e) {
