@@ -1,4 +1,0 @@
-lw t0 1200 t1
-add t7 s7 t7
-add t0 s2 t0
-sw t0 1200 t1

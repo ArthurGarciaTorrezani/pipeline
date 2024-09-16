@@ -16,7 +16,7 @@ public class ReaderFile {
     public static void Reader(String arquivo) throws IOException{ // Leitura do arquivo inserido na "principal".
         BufferedReader bf = new BufferedReader(new FileReader(arquivo));
         String linha;
-        String conteudo = "";
+        String content = "";
         ArrayList<Instruction> pipeline = new ArrayList<Instruction>();
       
         Instruction instruction;
@@ -47,11 +47,11 @@ public class ReaderFile {
            
                for (Instruction instru :  Bubble.implement(pipeline, arquivo)) {
                     System.out.println(instru.getAllValues());
-                    conteudo += instru.getAllValues();
-                    conteudo += "\n";
+                    content += instru.getAllValues();
+                    content += "\n";
                }
                bf.close();
-               criaArquivo(conteudo, arquivo);
+               //createFile(content, arquivo);
 
     }
 
@@ -74,12 +74,12 @@ public class ReaderFile {
         }
     }
 
-    public static void criaArquivo(String conteudo, String titulo) throws IOException{ // Criação do arquivo de resultado.
+    public static void createFile(String content, String title) throws IOException{ // Criação do arquivo de resultado.
 
-        titulo = titulo.split(".txt")[0];
-        titulo += "-RESULTADO.txt";
-        BufferedWriter out = new BufferedWriter(new FileWriter(titulo));
-        out.write(conteudo);
+        title = title.split(".txt")[0];
+        title += "-RESULTADO.txt";
+        BufferedWriter out = new BufferedWriter(new FileWriter(title));
+        out.write(content);
         out.flush();
         out.close();
 

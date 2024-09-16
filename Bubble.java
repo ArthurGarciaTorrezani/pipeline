@@ -19,7 +19,7 @@ public class Bubble {
                }
 
                int quant = quantNops(um, dois, tres);
-             
+
                if (execs.contains("01") || execs.contains("02") || execs.contains("05") || execs.contains("06")
                          || execs.contains("07")) {
                     insertBubble(um, quant, resposta);
@@ -87,21 +87,37 @@ public class Bubble {
 
           for (int i = 0; i < resposta.size(); i++) {
                Instruction base = resposta.get(i);
+               char firstLetter = base.getInstru().charAt(0);
                if (!base.getInstru().equals("nop")) {
-                    if (!dependence(i, resposta, 15)) {
-                         for (int j = 0; j < resposta.size(); j++) {
-                              if (resposta.get(j).getInstru().equals("nop")) { // com quem compara
-                                   Instruction comparada = resposta.get(j);
-                                   if (comparada.getInstru().equals("nop")) {
-                                        if (!dependence2(j, resposta, 2, i)) {
-                                             resposta.set(j, base);
-                                             resposta.remove(i);
-                                             break;
+                    if (firstLetter == 'j') {
+                         resposta.add(0, base);
+                         i += 1;
+                         resposta.remove(i);
+                    } else {
+                         if (!dependence(i, resposta, 15)) {
+
+                              if (firstLetter == 'b') {
+                                   resposta.add(0, base);
+                                   i += 1;
+                                   resposta.remove(i);
+                              } else {
+                                   for (int j = 0; j < resposta.size(); j++) {
+                                        if (resposta.get(j).getInstru().equals("nop")) { // com quem compara
+                                             Instruction comparada = resposta.get(j);
+                                             if (comparada.getInstru().equals("nop")) {
+                                                  if (!dependence2(j, resposta, 2, i)) {
+                                                       resposta.set(j, base);
+                                                       resposta.remove(i);
+                                                       break;
+                                                  }
+                                             }
                                         }
                                    }
                               }
+
                          }
                     }
+
                }
           }
 
