@@ -20,8 +20,8 @@ public class Bubble {
 
                int quant = quantNops(um, dois, tres);
 
-               if (execs.contains("01") || execs.contains("02") || execs.contains("05") || execs.contains("06")
-                         || execs.contains("07")) {
+               if (execs.equals("TESTE-01")|| execs.equals("TESTE-02") || execs.equals("TESTE-05") || execs.equals("TESTE-06")
+                         || execs.equals("TESTE-07")) {
                     insertBubble(um, quant, resposta);
                }
 
@@ -66,7 +66,6 @@ public class Bubble {
 
           if (quant == 0) {
                resposta.add(instru);
-
           }
 
           if (quant == 1) {
@@ -85,7 +84,7 @@ public class Bubble {
 
      public static void reordering(ArrayList<Instruction> resposta) {
 
-          for (int i = 0; i < resposta.size(); i++) {
+          for (int i = 0; i < resposta.size(); i++) { // pegar a instrucao principal
                Instruction base = resposta.get(i);
                char firstLetter = base.getInstru().charAt(0);
                if (!base.getInstru().equals("nop")) {
@@ -101,11 +100,11 @@ public class Bubble {
                                    i += 1;
                                    resposta.remove(i);
                               } else {
-                                   for (int j = 0; j < resposta.size(); j++) {
+                                   for (int j = 0; j < resposta.size(); j++) { // pegar a isntrucao a ser comparada
                                         if (resposta.get(j).getInstru().equals("nop")) { // com quem compara
                                              Instruction comparada = resposta.get(j);
                                              if (comparada.getInstru().equals("nop")) {
-                                                  if (!dependence2(j, resposta, 2, i)) {
+                                                  if (!conflito(j, resposta, 2, i)) {
                                                        resposta.set(j, base);
                                                        resposta.remove(i);
                                                        break;
@@ -157,7 +156,7 @@ public class Bubble {
           return false;
      }
 
-     private static boolean dependence2(int indexNum, ArrayList<Instruction> resposta, int quant, int indexNum2) {
+     private static boolean conflito(int indexNum, ArrayList<Instruction> resposta, int quant, int indexNum2) {
           Instruction principal = resposta.get(indexNum2);
           MipsInstructions mips = new MipsInstructions();
           int inicio = Math.max(0, indexNum - quant);
